@@ -33,7 +33,7 @@ jobs:
         run: |
           NUM_ISSUES=$(jq '. | length' issues.json)
 
-          for (( i=0; i<$NUM_ISSUES; i++ ))
+          for (( i=0; i<${NUM_ISSUES}; i++ ))
           do
             TITLE=$(jq '.[$i].title' issues.json)
             BODY=$(jq '.[$i].body' issues.json)
