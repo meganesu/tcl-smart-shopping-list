@@ -3,8 +3,8 @@ name: create-issues
 on: workflow_dispatch
 
 env:
-	# For using the GitHub CLI:
-	GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+  # For using the GitHub CLI:
+  GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
 jobs:
   get-issues-from-template:
