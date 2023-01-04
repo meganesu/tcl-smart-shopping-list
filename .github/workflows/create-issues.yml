@@ -8,12 +8,9 @@ env:
   GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
 jobs:
-  get-issues-from-template:
+  copy-issues-from-template-repo:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '14'
       - name: Get issues JSON from template repo
         run: |
           gh api \
@@ -33,11 +30,32 @@ jobs:
         run: |
           NUM_ISSUES=$(jq '. | length' issues.json)
 
-          for (( i=0; i<${NUM_ISSUES}; i++ ))
-          do
-            TITLE=$(jq '.[$i].title' issues.json)
-            BODY=$(jq '.[$i].body' issues.json)
-            echo "**********"
-            echo "TITLE: ${TITLE}"
-            echo "BODY: ${BODY}"
+          for (( i=0; i<${NUM_ISSUES}; i++ )); do
+            TITLE=$(jq -r --argjson index $i '.[$index].title' issues.json)
+            echo $TITLE
+
+            # Translation:
+            # TITLE=$(...) - Store the result of this expression in a variable called TITLE
+            # jq ... issues.json - Use the jq program to filter the JSON object in issues.json
+            # -r - This jq flag strips the quotes wrapping the value of the string result
+            #   (so that they don't appear in the actual PR title on GitHub)
+            # --argjson index $i - Pass the value of the $i variable (from the for loop) to
+            #   jq as an argument called index (jq can't use normal variables like i directly)
+            #   (Use --argjson, NOT --arg, which uses the value as a string and therefore can't
+            #   be used as an array index)
+            # '.[$index].title' - From the JSON object in issues.json, get the array element
+            #   at the specified index (this represents a single issue object), then get the
+            #   value of the `title` field from that issue object.
+
+            # Since the body string can have newlines in it,
+            # output the contents to a file instead (so that you don't
+            # get errors when using it in the `gh issue create` command).
+            BODY=$(jq -r --argjson index $i '.[$index].body' issues.json)
+            echo $BODY > issue_body.txt
+
+            # Use the GitHub CLI to create a new issue with the title and body we pulled
+            # from the template repo.
+            gh issue create --title "$TITLE" --body-file issue_body.txt
+
+            echo "***********"
           done
