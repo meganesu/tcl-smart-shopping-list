@@ -12,17 +12,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Get issues JSON from template repo
+        id: get-issues-json
         run: |
           gh api \
             -H "Accept: application/vnd.github+json" \
             /repos/$TEMPLATE_REPO/issues > issues.json
           echo "**********"
-          cat issues.json
+          echo "ISSUES_JSON=$(echo issues.json)" >> $GITHUB_OUTPUT
       - name: Sort issue objects in JSON file by GitHub issue number
+        id: sort-issues-json
         # Note: This assumes that we'll always keep the GitHub issues in the template repo
         #  in order. (i.e. The first issue Collabies tackle will have the lowest issue
         #  number, the second issue Collabies tackle will have the next lowest number, and so on.)
         run: |
+          echo "${{ steps.get-issues-json.outputs.ISSUES_JSON }}"
           jq 'sort_by(.number)' issues.json > issues.json
           echo "**********"
           cat issues.json
