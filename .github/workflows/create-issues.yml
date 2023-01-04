@@ -1,0 +1,7 @@
+name: create-issues
+on: workflow_dispatch
+jobs:
+  get-issues-from-template:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "We made it!"
