@@ -11,6 +11,7 @@ jobs:
   copy-issues-from-template-repo:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3 # Need access to this repo to use `gh issue create`
       - name: Get issues JSON from template repo
         id: get-issues-json
         run: |
