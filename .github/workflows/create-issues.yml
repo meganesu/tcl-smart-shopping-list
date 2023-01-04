@@ -18,26 +18,21 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             /repos/$TEMPLATE_REPO/issues > issues.json
           echo "**********"
-          # echo "ISSUES_JSON=$(cat issues.json)" >> $GITHUB_OUTPUT
       - name: Sort issue objects in JSON file by GitHub issue number
         id: sort-issues-json
         # Note: This assumes that we'll always keep the GitHub issues in the template repo
         #  in order. (i.e. The first issue Collabies tackle will have the lowest issue
         #  number, the second issue Collabies tackle will have the next lowest number, and so on.)
         run: |
-          # echo $steps.get-issues-json.outputs.ISSUES_JSON > issues.json
-          echo "starting file cat"
-          cat issues.json
-          echo "ending file cat"
-          jq 'sort_by(.number)' issues.json > issues.json
+          jq 'sort_by(.number)' issues.json > issues_sorted.json
           echo "**********"
-          cat issues.json
+          cat issues_sorted.json
       - name: Create new GitHub issues in the current repo
         run: |
-          NUM_ISSUES=$(jq '. | length' issues.json)
+          NUM_ISSUES=$(jq '. | length' issues_sorted.json)
 
           for (( i=0; i<${NUM_ISSUES}; i++ )); do
-            TITLE=$(jq -r --argjson index $i '.[$index].title' issues.json)
+            TITLE=$(jq -r --argjson index $i '.[$index].title' issues_sorted.json)
             echo $TITLE
 
             # Translation:
@@ -56,7 +51,7 @@ jobs:
             # Since the body string can have newlines in it,
             # output the contents to a file instead (so that you don't
             # get errors when using it in the `gh issue create` command).
-            BODY=$(jq -r --argjson index $i '.[$index].body' issues.json)
+            BODY=$(jq -r --argjson index $i '.[$index].body' issues_sorted.json)
             echo $BODY > issue_body.txt
 
             # Use the GitHub CLI to create a new issue with the title and body we pulled
