@@ -31,12 +31,12 @@ jobs:
           cat issues.json
       - name: Create new GitHub issues in the current repo
         run: |
-          NUM_ISSUES = $(jq '. | length' issues.json)
+          NUM_ISSUES=$(jq '. | length' issues.json)
 
           for (( i=0; i<$NUM_ISSUES; i++ ))
           do
-            TITLE = $(jq '.[$i].title' issues.json)
-            BODY = $(jq '.[$i].body' issues.json)
+            TITLE=$(jq '.[$i].title' issues.json)
+            BODY=$(jq '.[$i].body' issues.json)
             echo "**********"
             echo "TITLE: ${TITLE}"
             echo "BODY: ${BODY}"
