@@ -18,7 +18,7 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             /repos/$TEMPLATE_REPO/issues > issues.json
           echo "**********"
-          echo "ISSUES_JSON=$(echo issues.json)" >> $GITHUB_OUTPUT
+          echo "ISSUES_JSON=$(cat issues.json)" >> $GITHUB_OUTPUT
       - name: Sort issue objects in JSON file by GitHub issue number
         id: sort-issues-json
         # Note: This assumes that we'll always keep the GitHub issues in the template repo
