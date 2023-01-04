@@ -3,6 +3,7 @@ name: create-issues
 on: workflow_dispatch
 
 env:
+  TEMPLATE_REPO: the-collab-lab/smart-shopping-list
   # For using the GitHub CLI:
   GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
@@ -17,7 +18,7 @@ jobs:
         run: |
           gh api \
             -H "Accept: application/vnd.github+json" \
-            /repos/the-collab-lab/smart-shopping-list/issues > issues.json
+            /repos/$TEMPLATE_REPO/issues > issues.json
           echo "**********"
           cat issues.json
       - name: Check if jq works in GitHub Action
